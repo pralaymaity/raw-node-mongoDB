@@ -1,69 +1,91 @@
-import { getUserCollection } from "../config/db.js";
-import { ObjectId } from "mongodb";
+const userService = require("../service/user");
 
-export const userData = async (req, res) => {
-  const body = new Promise((resolve, reject) => {
-    let store = "";
+exports.createUser = async (req, res) => {
+  try {
+    let data = req.body;
 
-    req.on("data", (chunk) => {
-      store += chunk;
-    });
-
-    req.on("end", () => {
-      resolve(JSON.parse(store || {}));
-    });
-  });
-
-  return body;
+    const createUser = await userService.creteUser(data);
+    res.status(201).json({ message: "User Created" });
+  } catch (err) {
+    res.status(500).json("internal server problem");
+    console.log("failed to create user", err.message);
+  }
 };
 
-export const createUser = async (req, res) => {
-  const body = await userData(req);
-  const collection = await getUserCollection();
-  collection.insertOne(body);
-  res.writeHead(200);
-  res.end("User Created");
+exports.getAllUsers = async (req, res) => {
+
+  const age = req.query.age
+  //console.log(age);
+  
+  try {
+    const allData = await userService.getAllUser(Number(age));
+
+    res.status(200).json(allData);
+  } catch (err) {
+    console.log("failed to fetch user", err);
+    res.status(500).json({ message: "failed to fetch data" });
+  }
 };
 
-export const getAllUser = async (req, res) => {
-  const collection = await getUserCollection();
-  const users = await collection.find().toArray();
-  res.writeHead(200, { "Content-Type": "application/json" });
-  res.end(JSON.stringify(users));
+exports.getSingleUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log(id);
+
+    const singleDoc = await userService.getSingleUser(id);
+    res.status(200).json(singleDoc);
+  } catch (err) {
+    console.log("failed to fetch single user", err);
+    res.status(500).json({ message: "failed to fetch single user" });
+  }
 };
 
-export const deleteUser = async (req, res) => {
-  const id = req.url.split("/")[2];
+exports.updateSingleUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = req.body;
+    //console.log(data);
 
-  const collection = await getUserCollection();
-  await collection.deleteOne({ _id: ObjectId.createFromHexString(id) });
-
-  res.writeHead(200);
-  res.end("user is deleted");
+    await userService.updateSingleUser(id, data);
+    res.status(201).json({ message: "updated the user" });
+  } catch (err) {
+    res.status(500).json("failed to update user");
+    console.log("failed to update user", err);
+  }
 };
 
-export const updateUser = async (req, res) => {
-  //console.log(body , "sadasdasdas");
+exports.updateAllUser = async (req, res) => {
+  try {
+    // const id = req.params.id;
+    // const data = req.body;
+    //console.log(data);
 
-  const id = req.url.split("/")[2];
-  const body = await userData(req);
-  // console.log(body, "sadasdasdas");
-  const collection = await getUserCollection();
-
-  await collection.updateOne(
-    { _id: ObjectId.createFromHexString(id) },
-    { $set: body }
-  );
-
-  res.writeHead(200);
-  res.end("user is updated");
+    await userService.updateAllUser();
+    res.status(201).json({ message: "updated all the user" });
+  } catch (err) {
+    res.status(500).json("failed to update all user");
+    console.log("failed to update all user", err);
+  }
 };
 
-export const deleteAllUser = async (req, res) => {
+exports.deleteSingleUser = async (req, res) => {
+  try {
+    const id = req.params.id;
 
-  const collection = await getUserCollection()
-  await collection.deleteMany()
+    await userService.deleteSingleUser(id);
+    res.status(201).json({ message: "deleted the user" });
+  } catch (err) {
+    res.status(500).json("failed to delete user");
+    console.log("failed to delete user", err);
+  }
+};
 
-  res.writeHead(200);
-  res.end("all data is removed");
+exports.deleteAllUser = async (req, res) => {
+  try {
+    await userService.deleteAllUser();
+    res.status(201).json({ message: "deleted all the user" });
+  } catch (err) {
+    res.status(500).json("failed to delete user");
+    console.log("failed to delete user", err);
+  }
 };

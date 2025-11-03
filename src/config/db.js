@@ -1,25 +1,21 @@
-import { MongoClient } from "mongodb";
+
+const mongoose = require("mongoose");
 
 const url =
-  "mongodb+srv://pralaymaity283_db_user:0QVz0dumBBKNsWce@testdb.vttjb2f.mongodb.net/";
+  "mongodb+srv://pralaymaity283_db_user:0QVz0dumBBKNsWce@testdb.vttjb2f.mongodb.net/practiceDB";
+//const dbName = "practiceDB"
 
-const dbName = "practiceDB";
-
-let client;
-let db;
-
-// Connect to MongoDB (only once)
-export async function connectDB() {
-  if (!client) {
-    client = new MongoClient(url);
-    await client.connect();
-    console.log("✅ Connected to MongoDB Atlas");
-    db = client.db(dbName) 
+const connectDB =async () => {
+  try {
+    const mongodbConnection = await mongoose.connect(url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("✔ Database connected ");
+    
+  } catch (err) {
+    console.log("Database failed to connect", err);
   }
-  return db
-}
-
-export const getUserCollection = async () => {
-  const db = await connectDB();
-  return db.collection("users");
 };
+
+module.exports = connectDB;
