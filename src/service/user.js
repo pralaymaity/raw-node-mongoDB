@@ -1,39 +1,43 @@
 const User = require("../model/user");
 
-exports.creteUser = (data) => {
+exports.creteUser = async (data) => {
   return User.create(data);
 };
 
-exports.getAllUser = (age) => {
-    //console.log(age);
-    
-  let filterByAge = {};
+exports.getAllUser = async (page, limit, age) => {
+  let skipData = (page - 1) * limit;
+  let filterAge = {};
 
   if (age) {
-    filterByAge.age = { $gt: age };
+    filterAge.age = { $gt: age };
   }
-  return User.find(filterByAge);
+  const allUsersData = await User.find(filterAge).skip(skipData).limit(limit)
+        
+  const totalUsersCount = await User.countDocuments();
+
+  return { allUsersData, totalUsersCount };
 };
 
-exports.getSingleUser = (id) => {
+exports.getSingleUser = async (id) => {
   return User.findOne({ _id: id });
 };
 
-exports.updateSingleUser = (id, data) => {
-  return User.updateOne({ _id: id }, { $set: data });
+exports.updateSingleUser = async (id, data) => {
+  return User.updateOne({ _id: id }, { $set: { data } });
 };
 
-exports.updateAllUser = () => {
-  return User.updateMany(
-    { country: "England" },
-    { $set: { country: "India" } }
-  );
+exports.updateAllUser = async (age) => {
+  console.log(age);
+
+  if (age) {
+    return User.updateMany({}, { $inc: { age: age } });
+  }
 };
 
-exports.deleteSingleUser = (id) => {
+exports.deleteSingleUser = async (id) => {
   return User.deleteOne({ _id: id });
 };
 
-exports.deleteAllUser = () => {
+exports.deleteAllUser = async () => {
   return User.deleteMany();
 };

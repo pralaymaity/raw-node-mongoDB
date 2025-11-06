@@ -4,7 +4,7 @@ exports.createUser = async (req, res) => {
   try {
     let data = req.body;
 
-    const createUser = await userService.creteUser(data);
+    await userService.creteUser(data);
     res.status(201).json({ message: "User Created" });
   } catch (err) {
     res.status(500).json("internal server problem");
@@ -13,14 +13,23 @@ exports.createUser = async (req, res) => {
 };
 
 exports.getAllUsers = async (req, res) => {
+  const { page = 1, limit = 3, age } = req.query;
 
-  const age = req.query.age
-  //console.log(age);
-  
+  //console.log(page , limit);
+
   try {
-    const allData = await userService.getAllUser(Number(age));
-
-    res.status(200).json(allData);
+    const allData = await userService.getAllUser(
+      Number(page),
+      Number(limit),
+      Number(age)
+    );
+    //console.log(allData);
+    res.status(200).json({
+      totalUsers: allData.totalUsersCount,
+      pageNo: Number(page),
+      data: allData.allUsersData,
+    });
+    
   } catch (err) {
     console.log("failed to fetch user", err);
     res.status(500).json({ message: "failed to fetch data" });
@@ -60,7 +69,9 @@ exports.updateAllUser = async (req, res) => {
     // const data = req.body;
     //console.log(data);
 
-    await userService.updateAllUser();
+    const age = req.query.age;
+
+    await userService.updateAllUser(Number(age));
     res.status(201).json({ message: "updated all the user" });
   } catch (err) {
     res.status(500).json("failed to update all user");
