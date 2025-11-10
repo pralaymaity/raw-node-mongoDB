@@ -3,7 +3,8 @@ const express = require("express");
 const connectDB = require("./src/config/db");
 
 const userRoute = require("./src/routes/user");
-const loginRoute = require("./src/routes/login")
+const adminRoute = require("./src/routes/adminRoute");
+
 
 const port = 7000;
 
@@ -19,7 +20,8 @@ app.get("/", (req, res) => {
 connectDB()
 
 app.use("/api", userRoute);
-app.use("/api", loginRoute);
+app.use("/admin", adminRoute);
+
 
 app.listen(port, (req, res) => {
   console.log("server is running on port no.", port);

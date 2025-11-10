@@ -1,5 +1,7 @@
 const userService = require("../service/user");
 
+
+
 exports.createUser = async (req, res) => {
   try {
     let data = req.body;
@@ -13,15 +15,18 @@ exports.createUser = async (req, res) => {
 };
 
 exports.getAllUsers = async (req, res) => {
-  const { page = 1, limit = 3, age } = req.query;
+  const { page = 1, limit = 3, age, country, passport, language } = req.query;
 
-  //console.log(page , limit);
+  // console.log(passport);
 
   try {
     const allData = await userService.getAllUser(
       Number(page),
       Number(limit),
-      Number(age)
+      Number(age),
+      country,
+      passport,
+      language
     );
     //console.log(allData);
     res.status(200).json({

@@ -4,15 +4,33 @@ exports.creteUser = async (data) => {
   return User.create(data);
 };
 
-exports.getAllUser = async (page, limit, age) => {
-  let skipData = (page - 1) * limit;
-  let filterAge = {};
+exports.getAllUser = async (page, limit, age, country, passport, language ) => {
+  // console.log(language);
 
-  if (age) {
-    filterAge.age = { $gt: age };
+  let skipData = (page - 1) * limit;
+  let filterData = {};
+
+  if (age) filterData.age = { $eq: age };
+  if (country) filterData.country = { $eq: country };
+
+  if (passport) {
+    if (passport === "true") {
+      filterData.passport = { $eq: true };
+    } else if (passport === "false") {
+      filterData.passport = { $eq: false };
+    }
   }
-  const allUsersData = await User.find(filterAge).skip(skipData).limit(limit)
-        
+
+  if(country) filterData.country = {$eq : country};
+  if(language) filterData.language = {$eq : language};
+
+  // Find users who are from India AND speak English
+  if(country && language){
+    filterData.result = {$and : [{country : country}, {language : language}]}
+  }
+
+  const allUsersData = await User.find(filterData).skip(skipData).limit(limit);
+
   const totalUsersCount = await User.countDocuments();
 
   return { allUsersData, totalUsersCount };
