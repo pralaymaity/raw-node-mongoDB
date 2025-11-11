@@ -1,7 +1,5 @@
 const userService = require("../service/user");
 
-
-
 exports.createUser = async (req, res) => {
   try {
     let data = req.body;
@@ -44,7 +42,7 @@ exports.getAllUsers = async (req, res) => {
 exports.getSingleUser = async (req, res) => {
   try {
     const id = req.params.id;
-    console.log(id);
+   // console.log(id);
 
     const singleDoc = await userService.getSingleUser(id);
     res.status(200).json(singleDoc);
